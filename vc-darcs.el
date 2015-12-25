@@ -386,10 +386,8 @@ With darcs, this is simply the hash of the last patch that touched this file."
 REV and COMMENT are ignored."
   (vc-darcs-do-command 'add 0 files))
 
-(defun vc-darcs-checkin (files rev comment)
+(defun vc-darcs-checkin (files comment)
   "Record FILES to darcs.  COMMENT is the new comment."
-  (when (not (null rev))
-    (error "Cannot specify check-in revision with darcs."))
   (let* ((date (format-time-string "%Y%m%d%H%M%S" nil t))
          (match (string-match "\\`\\(Summary:[ \t]*\\)?\\([^\n]*\\)[ \t\n]*\\'"
                               comment))
@@ -415,9 +413,8 @@ REV and COMMENT are ignored."
 
 (defalias 'vc-darcs-find-version 'vc-darcs-find-revision)
 
-(defun vc-darcs-checkout (file &optional _editable rev)
-  "Check out FILE from the Darcs repository.
-EDITABLE is ignored."
+(defun vc-darcs-checkout (file &optional rev)
+  "Check out FILE from the Darcs repository."
   (let ((rev (vc-darcs-rev-to-hash rev file)))
     (when (and rev (not (equal rev (vc-darcs-workfile-version file))))
       (error "Cannot checkout old revisions with darcs."))
@@ -455,7 +452,7 @@ EDITABLE is ignored."
     (t
      nil)))
 
-(defun vc-darcs-print-log (files &optional buffer _shortlog start-revision limit)
+(defun vc-darcs-print-log (files buffer &optional _shortlog start-revision limit)
   "Print the logfile for the current darcs repository."
   ;; This is a hack to make C-x v L work
   (when (and (null (cdr files)) (equal (car files) (vc-darcs-root (car files))))
@@ -466,7 +463,7 @@ EDITABLE is ignored."
 	    (and start-hash (list "--to-hash" start-hash))
 	    (and limit (list "--last" (format "%d" limit)))))))
 
-(defun vc-darcs-diff (file &optional rev1 rev2 buffer dummy)
+(defun vc-darcs-diff (file &optional rev1 rev2 buffer async)
   "Show the differences in FILE between revisions REV1 and REV2."
   (let* ((async (not vc-disable-async-diff))
          (rev1 (vc-darcs-rev-to-hash rev1 file t))
