@@ -521,7 +521,7 @@ For Darcs, hashes and times are stored in text properties."
                    (and rev (list "--match" (concat "hash " rev))))
             (let ((output ()))
 	      (goto-char (point-min))
-	      (while (looking-at "^\\([-0-9a-f]+\\)\\.gz | \\(.*\\)$")
+	      (while (looking-at "^\\([-0-9a-f]+\\)\\(?:\\.gz\\)? | \\(.*\\)$")
 		(push (cons (match-string 1) (match-string 2)) output)
 		(forward-line 1))
 	      (nreverse output)))))
