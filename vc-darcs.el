@@ -467,20 +467,18 @@ EDITABLE is ignored."
 	    (and start-hash (list "--to-hash" start-hash))
 	    (and limit (list "--last" (format "%d" limit)))))))
 
-(defun vc-darcs-diff (file &optional rev1 rev2 buffer dummy)
+(defun vc-darcs-diff (file &optional rev1 rev2 buffer _async)
   "Show the differences in FILE between revisions REV1 and REV2."
-  (let* ((async (not vc-disable-async-diff))
-         (rev1 (vc-darcs-rev-to-hash rev1 file t))
+  (let* ((rev1 (vc-darcs-rev-to-hash rev1 file t))
          (rev2 (vc-darcs-rev-to-hash rev2 file))
          (arguments (cdr (assq 'diff vc-darcs-program-arguments)))
          (from (and rev1 (list "--from-match" (concat "hash " rev1))))
          (to (and rev2 (list "--to-match" (concat "hash " rev2)))))
-    (let ((status (apply #'vc-do-command (or buffer "*vc-diff*")
-                         (if async 'async 1)
-                         vc-darcs-program-name file
-                         "diff"
-                         (append from to arguments))))
-      (if async 1 status))))
+    (apply #'vc-do-command (or buffer "*vc-diff*")
+           nil ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=21969
+           vc-darcs-program-name file
+           "diff"
+           (append from to arguments))))
 
 (defun vc-darcs-rename-file (old new)
   "Rename the file OLD to NEW in the darcs repository."
