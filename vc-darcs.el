@@ -10,6 +10,7 @@
 ;; Package-Version: 20151225.1801
 ;; Package-X-Original-Version: 20141122.1326
 ;; Version: 1.19
+;; Package-Requires: ((emacs "24"))
 
 ;;; This program is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU General Public License
@@ -80,6 +81,8 @@
  (require 'vc))
 
 (require 'xml)
+
+(declare-function vc-exec-after "vc-dispatcher" (code))
 
 (defgroup vc-darcs nil
   "*The darcs backend for vc."
