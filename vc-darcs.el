@@ -157,14 +157,12 @@ list of arguments to pass."
                        (eq (car e) 'patch))
               (let ((h (cdr (assoc 'hash (cadr e)))))
                 (when h
-                  (push (substring h 0 61) l))))))
+                  (push h l))))))
         (nreverse l)))))
 
 (defun vc-darcs-hash-p (rev)
   "Return non-nil if REV has the syntax of a darcs hash."
-  (and (= (length rev) 61)
-       (eq (aref rev 14) ?-)
-       (eq (aref rev 20) ?-)
+  (and (= (length rev) 40)
        (string-match "[a-z0-9-]" rev)
        t))
 
@@ -496,12 +494,12 @@ EDITABLE is ignored."
     (if (integerp n) n 0)))
 
 (defun vc-darcs-alist-from-rev (file rev)
+  (message rev)
   (let* ((xml
 	  (with-temp-buffer
-	    (vc-do-command t 0 vc-darcs-program-name file
+	    (vc-do-command t 0 vc-darcs-program-name '()
 			   "changes" "--xml"
-			   "--from-match" (concat "hash " rev)
-			   "--to-match" (concat "hash " rev))
+			   "--hash" rev)
 	    (xml-parse-region 1 (point-max))))
 	 (patch
 	  (if (not (eq 'changelog (caar xml)))
@@ -558,7 +556,9 @@ For Darcs, hashes and times are stored in text properties."
 			 (vc-darcs-parse-integer day)
 			 (vc-darcs-parse-integer month)
 			 (vc-darcs-parse-integer year))))
-		 (begin (point)))
+		 (begin (point))
+         )
+        (insert (format "%-40s " rev))
 	    (cond
 	      ((string-match "<\\([^ <>@]*\\)@.*>" author)
 	       (setq author (match-string 1 author)))
