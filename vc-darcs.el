@@ -10,6 +10,7 @@
 ;; Package-Version: 20151225.1801
 ;; Package-X-Original-Version: 20141122.1326
 ;; Version: 1.19
+;; Package-Requires: ((emacs "24"))
 
 ;;; This program is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU General Public License
@@ -80,6 +81,8 @@
  (require 'vc))
 
 (require 'xml)
+
+(declare-function vc-exec-after "vc-dispatcher" (code))
 
 (defgroup vc-darcs nil
   "*The darcs backend for vc."
@@ -467,20 +470,18 @@ EDITABLE is ignored."
 	    (and start-hash (list "--to-hash" start-hash))
 	    (and limit (list "--last" (format "%d" limit)))))))
 
-(defun vc-darcs-diff (file &optional rev1 rev2 buffer dummy)
+(defun vc-darcs-diff (file &optional rev1 rev2 buffer _async)
   "Show the differences in FILE between revisions REV1 and REV2."
-  (let* ((async (not vc-disable-async-diff))
-         (rev1 (vc-darcs-rev-to-hash rev1 file t))
+  (let* ((rev1 (vc-darcs-rev-to-hash rev1 file t))
          (rev2 (vc-darcs-rev-to-hash rev2 file))
          (arguments (cdr (assq 'diff vc-darcs-program-arguments)))
          (from (and rev1 (list "--from-match" (concat "hash " rev1))))
          (to (and rev2 (list "--to-match" (concat "hash " rev2)))))
-    (let ((status (apply #'vc-do-command (or buffer "*vc-diff*")
-                         (if async 'async 1)
-                         vc-darcs-program-name file
-                         "diff"
-                         (append from to arguments))))
-      (if async 1 status))))
+    (apply #'vc-do-command (or buffer "*vc-diff*")
+           nil ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=21969
+           vc-darcs-program-name file
+           "diff"
+           (append from to arguments))))
 
 (defun vc-darcs-rename-file (old new)
   "Rename the file OLD to NEW in the darcs repository."
@@ -521,8 +522,9 @@ For Darcs, hashes and times are stored in text properties."
                    (and rev (list "--match" (concat "hash " rev))))
             (let ((output ()))
 	      (goto-char (point-min))
-	      (while (looking-at "^\\([-0-9a-f]+\\)\\.gz | \\(.*\\)$")
-		(push (cons (match-string 1) (match-string 2)) output)
+	      (while (looking-at "^\\([-0-9a-f]+\\)\\(?:\\.gz\\)? | \\(.*\\)$")
+                (unless (string= (match-string 1) "0000000000000000000000000000000000000000")
+                  (push (cons (match-string 1) (match-string 2)) output))
 		(forward-line 1))
 	      (nreverse output)))))
     (with-current-buffer buffer
