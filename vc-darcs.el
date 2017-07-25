@@ -512,6 +512,7 @@ EDITABLE is ignored."
 (defun vc-darcs-annotate-command (file buffer &optional rev)
   "Produce an annotated display of fiLE in BUFFER.
 For Darcs, hashes and times are stored in text properties."
+  (vc-setup-buffer buffer)
   (let* ((rev (vc-darcs-rev-to-hash rev file))
          (data
           (with-temp-buffer
