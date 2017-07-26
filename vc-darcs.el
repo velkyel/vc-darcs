@@ -466,7 +466,7 @@ EDITABLE is ignored."
     (apply #'vc-do-command buffer 'async vc-darcs-program-name files "changes"
            (append
             (and start-hash (list "--to-hash" start-hash))
-            (and limit (list "--last" (format "%d" limit)))))))
+            (and limit (list "--max-count" (format "%d" limit)))))))
 
 (defun vc-darcs-diff (file &optional rev1 rev2 buffer _async)
   "Show the differences in FILE between revisions REV1 and REV2."
