@@ -247,8 +247,8 @@ list of arguments to pass."
   (with-temp-buffer
     (vc-do-command t nil vc-darcs-program-name file
                    "whatsnew" "--summary")
-    (goto-char (point-max))
-    (forward-line -1)
+    (goto-char (point-min))
+    (forward-line 1)
     (cond
      ((looking-at "No changes")
       (if (vc-darcs-registered file) 'up-to-date 'unregistered))
