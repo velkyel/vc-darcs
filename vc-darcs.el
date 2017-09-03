@@ -442,7 +442,7 @@ EDITABLE is ignored."
   (set (make-local-variable 'log-view-per-file-logs) nil)
   (set (make-local-variable 'log-view-file-re) "\\`a\\`")
   (set (make-local-variable 'log-view-message-re)
-       "^  \\* \\(.+\\)")
+       "^patch \\([0-9a-f]\\{40\\}\\)")
   (set (make-local-variable 'log-view-font-lock-keywords)
        '(("^\\([A-Z][a-z][a-z] .*[0-9]\\)  \\([^<>]+\\) \\(<[^<>]+>\\)"
           (1 'change-log-date)
