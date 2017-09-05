@@ -224,8 +224,11 @@ list of arguments to pass."
             (goto-char (point-min))
             (while (looking-at "[^\n]+")
               ;; Darcs always prints relative to the root
-              (let ((file2 (expand-file-name (match-string 0) root)))
-                (when (equal file2 file)
+              (let* ((line (match-string 0))
+                     (file2 (expand-file-name line root)))
+                (when (or
+                       (equal file2 file)
+                       (equal line "darcs: can't mix match and pending flags"))
                   (throw 'found t))
                 (forward-line)))
             nil)))))))
@@ -244,8 +247,8 @@ list of arguments to pass."
   (with-temp-buffer
     (vc-do-command t nil vc-darcs-program-name file
                    "whatsnew" "--summary")
-    (goto-char (point-max))
-    (forward-line -1)
+    (goto-char (point-min))
+    (forward-line 1)
     (cond
      ((looking-at "No changes")
       (if (vc-darcs-registered file) 'up-to-date 'unregistered))
@@ -521,6 +524,8 @@ For Darcs, hashes and times are stored in text properties."
                    (and rev (list "--match" (concat "hash " rev))))
             (let ((output ()))
               (goto-char (point-min))
+              (if (looking-at "^Rebase in progress:")
+                  (forward-line 1))
               (while (looking-at "^\\([-0-9a-f]+\\)\\(?:\\.gz\\)? | \\(.*\\)$")
                 (unless (string= (match-string 1) "0000000000000000000000000000000000000000")
                   (push (cons (match-string 1) (match-string 2)) output))
