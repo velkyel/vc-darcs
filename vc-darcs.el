@@ -439,7 +439,7 @@ EDITABLE is ignored."
   (set (make-local-variable 'log-view-per-file-logs) nil)
   (set (make-local-variable 'log-view-file-re) "\\`a\\`")
   (set (make-local-variable 'log-view-message-re)
-       "^  \\* \\(.+\\)")
+       "^patch \\([0-9a-f]\\{40\\}\\)")
   (set (make-local-variable 'log-view-font-lock-keywords)
        '(("^\\([A-Z][a-z][a-z] .*[0-9]\\)  \\([^<>]+\\) \\(<[^<>]+>\\)"
           (1 'change-log-date)
@@ -466,7 +466,7 @@ EDITABLE is ignored."
     (apply #'vc-do-command buffer 'async vc-darcs-program-name files "changes"
            (append
             (and start-hash (list "--to-hash" start-hash))
-            (and limit (list "--last" (format "%d" limit)))))))
+            (and limit (list "--max-count" (format "%d" limit)))))))
 
 (defun vc-darcs-diff (file &optional rev1 rev2 buffer _async)
   "Show the differences in FILE between revisions REV1 and REV2."
@@ -512,6 +512,7 @@ EDITABLE is ignored."
 (defun vc-darcs-annotate-command (file buffer &optional rev)
   "Produce an annotated display of fiLE in BUFFER.
 For Darcs, hashes and times are stored in text properties."
+  (vc-setup-buffer buffer)
   (let* ((rev (vc-darcs-rev-to-hash rev file))
          (data
           (with-temp-buffer
