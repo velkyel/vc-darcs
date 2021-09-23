@@ -434,6 +434,8 @@ EDITABLE is ignored."
   (unless contents-done
     (vc-darcs-do-command 'revert 0 file "-a")))
 
+(defun vc-darcs-push (&optional args)
+    (vc-darcs-do-command 'push 0 nil "-a"))
 
 ;;; History functions
 
