@@ -391,7 +391,7 @@ With darcs, this is simply the hash of the last patch that touched this file."
 REV and COMMENT are ignored."
   (vc-darcs-do-command 'add 0 files))
 
-(defun vc-darcs-checkin (files rev comment)
+(defun vc-darcs-checkin (files comment rev)
   "Record FILES to darcs.  COMMENT is the new comment."
   (when (not (null rev))
     (error "Cannot specify check-in revision with darcs."))
