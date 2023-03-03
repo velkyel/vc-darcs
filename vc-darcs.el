@@ -350,7 +350,7 @@ list of arguments to pass."
   "Return non-nil if we feel responsible for FILE,
  which can also be a directory."
   (and (not (vc-darcs-special-file-p file))
-       (not (null (vc-darcs-root file)))))
+       (vc-darcs-root file)))
 
 (defun vc-darcs-could-register (file)
   "Return non-nil if FILE could be registered."
